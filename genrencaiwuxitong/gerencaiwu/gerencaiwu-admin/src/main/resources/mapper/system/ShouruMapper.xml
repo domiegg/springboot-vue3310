@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gerencaiwu.web.controller.system.mapper.ShouruMapper">
+
+    <resultMap type="Shouru" id="ShouruResult">
+        <result property="id"    column="id"    />
+        <result property="name"    column="name"    />
+        <result property="type"    column="type"    />
+        <result property="payAmount"    column="payAmount"    />
+        <result property="payWay"    column="payWay"    />
+        <result property="time"    column="time"    />
+        <result property="username"    column="username"    />
+        <result property="userId"    column="userId"    />
+        <result property="remark"    column="remark"    />
+    </resultMap>
+
+    <sql id="selectShouruVo">
+        select s.id, s.name, s.payAmount, s.payWay, s.time, su.user_name username, s.userId, s.remark,s.typeId,
+            f.name type
+        from a_shouru s left join a_fenlei f on s.typeId = f.id
+        left join sys_user su on s.userId = su.user_id
+    </sql>
+
+    <select id="selectShouruList" parameterType="Shouru" resultMap="ShouruResult">
+        <include refid="selectShouruVo"/>
+        <where>
+            <if test="name != null  and name != ''"> and s.name like concat('%', #{name}, '%')</if>
+            <if test="type != null  and type != ''"> and type = #{type}</if>
+            <if test="typeId != null  and typeId != ''"> and f.id = #{typeId}</if>
+            <if test="payAmount != null "> and payAmount = #{payAmount}</if>
+            <if test="payWay != null  and payWay != ''"> and payWay = #{payWay}</if>
+            <if test="timeStart != null and timeEnd != null"> and s.time between #{timeStart} and #{timeEnd}</if>
+            <if test="username != null  and username != ''"> and su.user_name like concat('%', #{username}, '%')</if>
+            <if test="userId != null "> and s.userId = #{userId}</if>
+        </where>
+    </select>
+
+    <select id="selectShouruById" parameterType="Long" resultMap="ShouruResult">
+        <include refid="selectShouruVo"/>
+        where s.id = #{id}
+    </select>
+
+    <insert id="insertShouru" parameterType="Shouru" useGeneratedKeys="true" keyProperty="id">
+        insert into a_shouru
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="name != null">name,</if>
+            <if test="type != null">type,</if>
+            <if test="typeId != null">typeId,</if>
+            <if test="payAmount != null">payAmount,</if>
+            <if test="payWay != null">payWay,</if>
+            <if test="time != null">time,</if>
+            <if test="username != null">username,</if>
+            <if test="userId != null">userId,</if>
+            <if test="remark != null">remark,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="name != null">#{name},</if>
+            <if test="type != null">#{type},</if>
+            <if test="typeId != null">#{typeId},</if>
+            <if test="payAmount != null">#{payAmount},</if>
+            <if test="payWay != null">#{payWay},</if>
+            <if test="time != null">#{time},</if>
+            <if test="username != null">#{username},</if>
+            <if test="userId != null">#{userId},</if>
+            <if test="remark != null">#{remark},</if>
+         </trim>
+    </insert>
+
+    <update id="updateShouru" parameterType="Shouru">
+        update a_shouru
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="name != null">name = #{name},</if>
+            <if test="type != null">type = #{type},</if>
+            <if test="typeId != null">typeId = #{typeId},</if>
+            <if test="payAmount != null">payAmount = #{payAmount},</if>
+            <if test="payWay != null">payWay = #{payWay},</if>
+            <if test="time != null">time = #{time},</if>
+            <if test="username != null">username = #{username},</if>
+            <if test="userId != null">userId = #{userId},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteShouruById" parameterType="Long">
+        delete from a_shouru where id = #{id}
+    </delete>
+
+    <delete id="deleteShouruByIds" parameterType="String">
+        delete from a_shouru where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gerencaiwu.web.controller.system.mapper.YusuanMapper">
+
+    <resultMap type="Yusuan" id="YusuanResult">
+        <result property="id"    column="id"    />
+        <result property="typeId"    column="typeId"    />
+        <result property="amount"    column="amount"    />
+    </resultMap>
+
+    <sql id="selectYusuanVo">
+        select id, typeId, amount from a_yusuan
+    </sql>
+
+    <select id="selectYusuanList" resultType="com.gerencaiwu.web.controller.system.domain.Yusuan">
+        select f.name typeName,ifnull(y.amount,0) amount,f.id id
+        from a_fenlei f left join a_yusuan y on f.id = y.typeId
+                        left join sys_user su on su.user_id = y.userId
+        where 1=1
+        <if test="userId != null">
+            and f.userId = #{userId}
+        </if>
+        <if test="typeName != null">
+            and f.name like concat('%',#{typeName},'%')
+        </if>
+    </select>
+
+    <select id="selectYusuanById" parameterType="Long" resultMap="YusuanResult">
+        select f.name typeName,f.id id, ifnull(y.amount,0) amount
+        from a_fenlei f left join a_yusuan y on f.id = y.typeId
+        where f.id = #{id}
+    </select>
+
+    <insert id="insertYusuan" parameterType="Yusuan">
+        insert into a_yusuan
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="typeId != null">typeId,</if>
+            <if test="userId != null">userId,</if>
+            <if test="amount != null">amount,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="typeId != null">#{typeId},</if>
+            <if test="userId != null">#{userId},</if>
+            <if test="amount != null">#{amount},</if>
+         </trim>
+    </insert>
+
+    <update id="updateYusuan" parameterType="Yusuan">
+        update a_yusuan
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="typeId != null">typeId = #{typeId},</if>
+            <if test="amount != null">amount = #{amount},</if>
+            <if test="userId != null">userId = #{userId},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteYusuanById" parameterType="Long">
+        delete from a_yusuan where id = #{id}
+    </delete>
+
+    <delete id="deleteYusuanByIds" parameterType="String">
+        delete from a_yusuan where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <select id="selectyusuan" resultType="com.gerencaiwu.web.controller.system.domain.Yusuan">
+        select * from a_yusuan where typeId = #{id} and userId = #{userId}
+    </select>
+</mapper>

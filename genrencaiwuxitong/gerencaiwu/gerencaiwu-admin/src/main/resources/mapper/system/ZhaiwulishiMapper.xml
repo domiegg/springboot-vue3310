@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gerencaiwu.web.controller.system.mapper.ZhaiwulishiMapper">
+
+    <resultMap type="Zhaiwulishi" id="ZhaiwulishiResult">
+        <result property="id"    column="id"    />
+        <result property="zhaiwuId"    column="zhaiwuId"    />
+        <result property="amount"    column="amount"    />
+        <result property="type"    column="type"    />
+        <result property="time"    column="time"    />
+        <result property="name"    column="name"    />
+    </resultMap>
+
+    <sql id="selectZhaiwulishiVo">
+        select id, zhaiwuId, amount, type, time,name from a_zhaiwulishi
+    </sql>
+
+    <select id="selectZhaiwulishiList" parameterType="Zhaiwulishi" resultMap="ZhaiwulishiResult">
+        <include refid="selectZhaiwulishiVo"/>
+        <where>
+            <if test="zhaiwuId != null "> and zhaiwuId = #{zhaiwuId}</if>
+            <if test="amount != null "> and amount = #{amount}</if>
+            <if test="userId != null "> and userId = #{userId}</if>
+            <if test="type != null  and type != ''"> and type = #{type}</if>
+            <if test="timeStart != null and timeEnd != null"> and time between #{timeStart} and #{timeEnd}</if>
+            <if test="name != null "> and name like concat('%', #{name}, '%')</if>
+        </where>
+    </select>
+
+    <select id="selectZhaiwulishiById" parameterType="Long" resultMap="ZhaiwulishiResult">
+        <include refid="selectZhaiwulishiVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertZhaiwulishi" parameterType="Zhaiwulishi" useGeneratedKeys="true" keyProperty="id">
+        insert into a_zhaiwulishi
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="zhaiwuId != null">zhaiwuId,</if>
+            <if test="amount != null">amount,</if>
+            <if test="type != null">type,</if>
+            <if test="userId != null">userId,</if>
+            <if test="time != null">time,</if>
+            <if test="name != null">name,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="zhaiwuId != null">#{zhaiwuId},</if>
+            <if test="amount != null">#{amount},</if>
+            <if test="type != null">#{type},</if>
+            <if test="userId != null">#{userId},</if>
+            <if test="time != null">#{time},</if>
+            <if test="name != null">#{name},</if>
+         </trim>
+    </insert>
+
+    <update id="updateZhaiwulishi" parameterType="Zhaiwulishi">
+        update a_zhaiwulishi
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="zhaiwuId != null">zhaiwuId = #{zhaiwuId},</if>
+            <if test="amount != null">amount = #{amount},</if>
+            <if test="type != null">type = #{type},</if>
+            <if test="time != null">time = #{time},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteZhaiwulishiById" parameterType="Long">
+        delete from a_zhaiwulishi where id = #{id}
+    </delete>
+
+    <delete id="deleteZhaiwulishiByIds" parameterType="String">
+        delete from a_zhaiwulishi where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

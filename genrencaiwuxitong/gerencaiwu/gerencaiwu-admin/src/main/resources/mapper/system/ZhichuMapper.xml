@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gerencaiwu.web.controller.system.mapper.ZhichuMapper">
+
+    <resultMap type="Zhichu" id="ZhichuResult">
+        <result property="id"    column="id"    />
+        <result property="name"    column="name"    />
+        <result property="type"    column="type"    />
+        <result property="payAmount"    column="payAmount"    />
+        <result property="payWay"    column="payWay"    />
+        <result property="time"    column="time"    />
+        <result property="username"    column="username"    />
+        <result property="userId"    column="userId"    />
+        <result property="remark"    column="remark"    />
+    </resultMap>
+
+    <sql id="selectZhichuVo">
+        select z.id, z.name, f.name type, z.payAmount, z.payWay, z.time, su.user_name username, z.userId, z.remark,z.typeId
+        from a_zhichu z left join a_fenlei f on z.typeId = f.id left join sys_user su on su.user_id = z.userId
+    </sql>
+
+    <select id="selectZhichuList" parameterType="Zhichu" resultMap="ZhichuResult">
+        <include refid="selectZhichuVo"/>
+        <where>
+            <if test="name != null  and name != ''"> and z.name like concat('%', #{name}, '%')</if>
+            <if test="type != null  and type != ''"> and z.type = #{type}</if>
+            <if test="typeId != null  and typeId != ''"> and f.id = #{typeId}</if>
+            <if test="payAmount != null "> and z.payAmount = #{payAmount}</if>
+            <if test="payWay != null  and payWay != ''"> and z.payWay = #{payWay}</if>
+            <if test="timeStart != null and timeEnd != null"> and z.time between #{timeStart} and #{timeEnd}</if>
+            <if test="username != null  and username != ''"> and su.user_name like concat('%', #{username}, '%')</if>
+            <if test="userId != null "> and z.userId = #{userId}</if>
+        </where>
+    </select>
+
+    <select id="selectZhichuById" parameterType="Long" resultMap="ZhichuResult">
+        <include refid="selectZhichuVo"/>
+        where z.id = #{id}
+    </select>
+
+    <insert id="insertZhichu" parameterType="Zhichu" useGeneratedKeys="true" keyProperty="id">
+        insert into a_zhichu
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="name != null">name,</if>
+            <if test="type != null">type,</if>
+            <if test="typeId != null">typeId,</if>
+            <if test="payAmount != null">payAmount,</if>
+            <if test="payWay != null">payWay,</if>
+            <if test="time != null">time,</if>
+            <if test="username != null">username,</if>
+            <if test="userId != null">userId,</if>
+            <if test="remark != null">remark,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="name != null">#{name},</if>
+            <if test="type != null">#{type},</if>
+            <if test="typeId != null">#{typeId},</if>
+            <if test="payAmount != null">#{payAmount},</if>
+            <if test="payWay != null">#{payWay},</if>
+            <if test="time != null">#{time},</if>
+            <if test="username != null">#{username},</if>
+            <if test="userId != null">#{userId},</if>
+            <if test="remark != null">#{remark},</if>
+         </trim>
+    </insert>
+
+    <update id="updateZhichu" parameterType="Zhichu">
+        update a_zhichu
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="name != null">name = #{name},</if>
+            <if test="type != null">type = #{type},</if>
+            <if test="typeId != null">typeId = #{typeId},</if>
+            <if test="payAmount != null">payAmount = #{payAmount},</if>
+            <if test="payWay != null">payWay = #{payWay},</if>
+            <if test="time != null">time = #{time},</if>
+            <if test="username != null">username = #{username},</if>
+            <if test="userId != null">userId = #{userId},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteZhichuById" parameterType="Long">
+        delete from a_zhichu where id = #{id}
+    </delete>
+
+    <delete id="deleteZhichuByIds" parameterType="String">
+        delete from a_zhichu where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <select id="selectOldAmount" resultType="java.math.BigDecimal">
+        select sum(payAmount) from a_zhichu
+        where typeId = #{typeId}
+    </select>
+</mapper>

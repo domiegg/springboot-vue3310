@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gerencaiwu.web.controller.system.mapper.CaiwuMapper">
+
+    <select id="getTotalIncome" resultType="java.math.BigDecimal">
+        select sum(payAmount) from a_shouru where userId = #{userId}
+    </select>
+
+    <select id="getTotalExpense" resultType="java.math.BigDecimal">
+        select sum(payAmount) from a_zhichu where userId = #{userId}
+    </select>
+
+    <select id="getTotalDebt" resultType="java.math.BigDecimal">
+        select sum(payAmount) from a_zhaiwu where userId = #{userId}
+    </select>
+
+    <select id="selectShouru" resultType="java.math.BigDecimal">
+        select sum(payAmount) from a_shouru where typeId = #{fenleiId} and userId = #{userId}
+    </select>
+
+    <select id="selectZhichu" resultType="java.util.Map">
+        select sum(payAmount) value,f.name
+        from a_zhichu z left join a_fenlei f on z.typeId = f.id
+        where z.userId = #{userId}
+        group by typeId
+    </select>
+
+    <select id="selectZhaiwu" resultType="java.util.Map">
+        select sum(payAmount) value,type name from a_zhaiwu
+        where userId = #{userId}
+        group by type
+    </select>
+</mapper>
